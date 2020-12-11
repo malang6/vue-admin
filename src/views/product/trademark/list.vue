@@ -93,9 +93,19 @@
         </el-form-item>
 
         <el-form-item label="品牌LOGO" prop="logoUrl">
+          <!--
+            前提允许跨域
+              action="http://182.92.128.115/admin/product/fileUpload"
+              目标服务器地址: 代理配置中 (vue.config.js)
+
+            不允许跨域，就使用proxy
+              action="/dev-api/admin/product/fileUpload"
+              /dev-api -> request.js 代理
+             在main.js中定义 Vue.prototype.$BASE_API = process.env.VUE_APP_BASE_API
+           -->
           <el-upload
             class="avatar-uploader"
-            action="/dev-api/admin/product/fileUpload"
+            :action="`${$BASE_API}/admin/product/fileUpload`"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -132,12 +142,14 @@ export default {
       total: 0, // 总数
       page: 1, // 页码
       limit: 3, // 每页条数
-      visible: false,
+      visible: false, // 对话框显示&隐藏
       tradeMarkForm: {
+        // 表单数据
         tmName: "",
         logoUrl: "",
       },
       rules: {
+        // 表单校验规则
         tmName: [
           { required: true, message: "请输入品牌名称", trigger: "blur" },
         ],
@@ -180,37 +192,45 @@ export default {
     },
     //图片上传之前的回调
     beforeAvatarUpload(file) {
-      const logoType = ["image/jpeg", "image/jpg", "image/png"];
-      const isVailImg = logoType.indexOf(file.type) > -1;
+      const logoTypes = ["image/jpeg", "image/jpg", "image/png"];
+      // 检测文件类型
+      const isVailImg = logoTypes.indexOf(file.type) > -1;
       const isLt = file.size / 1024 < 50;
 
       if (!isVailImg) {
         this.$message.error("上传品牌LOGO图片只能是 JPG 格式!");
       }
+      // 检测文件大小
       if (!isLt) {
         this.$message.error("上传品牌LOGO图片大小不能超过 50kb!");
       }
+      // 返回值为true，代表可以上传
+      // 返回值为false，代表不可以上传
       return isVailImg && isLt;
     },
     //图片上传成功的回调
-    handleAvatarSuccess(res, file) {
-      this.tradeMarkForm.logoUrl = URL.createObjectURL(file.raw);
+    handleAvatarSuccess(res) {
+      // console.log(res.data); // 图片地址
+      this.tradeMarkForm.logoUrl = res.data;
     },
     //提交表单
-    submitForm(tradeMarkForm) {
-      this.$refs[tradeMarkForm].validate(async (valid) => {
+    submitForm(form) {
+      // 校验表单
+      this.$refs[form].validate(async (valid) => {
         if (valid) {
+          // 表单校验通过
           this.$message.success("添加品牌信息成功~");
           const result = await this.$API.tradeMark.addTrademark(
             this.tradeMarkForm
           );
           if (result.code === 200) {
-            this.visible = false;
+            this.visible = false; // 隐藏对话框
             this.tradeMarkForm.tmName = "";
             this.tradeMarkForm.logoUrl = "";
-            this.getPageList(this.page, this.limit);
+            this.getPageList(this.page, this.limit); // 请求加载新数据
           }
         } else {
+          this.$message.error(result.message);
           return false;
         }
       });
