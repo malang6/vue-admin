@@ -22,12 +22,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <!-- v-slot="scoped" 作用域插槽  elementUI里用的slot-scoped是老语法，即将被废弃的 -->
-        <template v-slot="{ row }">
+        <template v-slot="scope">
           <el-button
             type="warning"
             icon="el-icon-edit"
             size="mini"
-            @click="updateTrademark(row)"
+            @click="updateTrademark(scope.row)"
             >修改</el-button
           >
           <el-button
@@ -157,6 +157,7 @@ export default {
         // 表单校验规则
         tmName: [
           // { required: true, message: "请输入品牌名称", trigger: "blur" },
+          
           //自定义校验规则
           {
             validator: this.validator,
