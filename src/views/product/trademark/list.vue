@@ -157,7 +157,7 @@ export default {
         // 表单校验规则
         tmName: [
           // { required: true, message: "请输入品牌名称", trigger: "blur" },
-          
+
           //自定义校验规则
           {
             validator: this.validator,
@@ -256,7 +256,6 @@ export default {
           }
           if (result.code === 200) {
             this.visible = false; // 隐藏对话框
-            this.tradeMarkForm = {};
             this.getPageList(this.page, this.limit); // 请求加载新数据
           }
           this.$message.success(`${id ? "修改" : "添加"}品牌信息成功~`);
@@ -295,6 +294,10 @@ export default {
       this.visible = true;
       //清空表单校验失败的提示
       this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate();
+      this.tradeMarkForm = {
+        tmName: "",
+        logoUrl: "",
+      };
     },
     //修改品牌信息
     updateTrademark(row) {
