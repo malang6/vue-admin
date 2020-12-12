@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" icon="el-icon-plus" @click="visible = true"
+    <el-button type="primary" icon="el-icon-plus" @click="addTrademark"
       >添加</el-button
     >
     <el-table :data="tradeMarkList" border style="width: 100%; margin: 20px 0">
@@ -21,8 +21,13 @@
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button type="warning" icon="el-icon-edit" size="mini"
+        <!-- v-slot="scoped" 作用域插槽  elementUI里用的slot-scoped是老语法，即将被废弃的 -->
+        <template v-slot="{ row }">
+          <el-button
+            type="warning"
+            icon="el-icon-edit"
+            size="mini"
+            @click="updateTrademark(row)"
             >修改</el-button
           >
           <el-button
@@ -76,7 +81,7 @@
     </el-pagination>
 
     <el-dialog
-      title="添加品牌"
+      :title="`${tradeMarkForm.id ? '修改' : '添加'}品牌`"
       :visible.sync="visible"
       width="50%"
       :before-close="handleClose"
@@ -151,13 +156,27 @@ export default {
       rules: {
         // 表单校验规则
         tmName: [
-          { required: true, message: "请输入品牌名称", trigger: "blur" },
+          // { required: true, message: "请输入品牌名称", trigger: "blur" },
+          //自定义校验规则
+          {
+            validator: this.validator,
+            trigger: "blur",
+          },
         ],
         logoUrl: [{ required: true, message: "请上传品牌图片" }],
       },
     };
   },
   methods: {
+    //自定义表单校验
+    validator(rule, value, callback) {
+      if (!value) {
+        return callback(new Error("请输入品牌名称"));
+      } else if (value.length < 2 || value.length > 10) {
+        return callback(new Error("输入的品牌名称长度为2-10"));
+      }
+      callback();
+    },
     // 请求分页列表数据
     async getPageList(page, limit) {
       const result = await this.$API.tradeMark.getPageList(page, limit);
@@ -181,14 +200,12 @@ export default {
     //点 X 关闭弹窗
     handleClose() {
       this.visible = false;
-      this.tradeMarkForm.tmName = "";
-      this.tradeMarkForm.logoUrl = "";
+      this.tradeMarkForm = {};
     },
     //点取消按钮 关闭弹窗
     cancel() {
       this.visible = false;
-      this.tradeMarkForm.tmName = "";
-      this.tradeMarkForm.logoUrl = "";
+      this.tradeMarkForm = {};
     },
     //图片上传之前的回调
     beforeAvatarUpload(file) {
@@ -215,22 +232,35 @@ export default {
     },
     //提交表单
     submitForm(form) {
+      const { id } = this.tradeMarkForm;
       // 校验表单
       this.$refs[form].validate(async (valid) => {
         if (valid) {
+          let result;
           // 表单校验通过
-          this.$message.success("添加品牌信息成功~");
-          const result = await this.$API.tradeMark.addTrademark(
-            this.tradeMarkForm
-          );
+          if (id) {
+            const tm = this.tradeMarkList.find((tm) => tm.id === id);
+            if (
+              tm.tmName !== this.tradeMarkForm.tmName ||
+              tm.logoUrl !== this.tradeMarkForm.logoUrl
+            ) {
+              result = await this.$API.tradeMark.updateTrademark(
+                this.tradeMarkForm
+              );
+            } else {
+              return this.$message.warning("请修改了数据再提交表单");
+            }
+          } else {
+            result = await this.$API.tradeMark.addTrademark(this.tradeMarkForm);
+          }
           if (result.code === 200) {
             this.visible = false; // 隐藏对话框
-            this.tradeMarkForm.tmName = "";
-            this.tradeMarkForm.logoUrl = "";
+            this.tradeMarkForm = {};
             this.getPageList(this.page, this.limit); // 请求加载新数据
           }
+          this.$message.success(`${id ? "修改" : "添加"}品牌信息成功~`);
         } else {
-          this.$message.error(result.message);
+          // this.$message.error(result.message);
           return false;
         }
       });
@@ -258,6 +288,32 @@ export default {
             message: "已取消删除",
           });
         });
+    },
+    //添加品牌信息
+    addTrademark() {
+      this.visible = true;
+      //清空表单校验失败的提示
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate();
+    },
+    //修改品牌信息
+    updateTrademark(row) {
+      //清空表单校验失败的提示
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate();
+      /*
+        const a = [{x: 1}];
+        const b = a[0];
+        b.x = 2;
+
+        trademarkList: [row]
+        trademarkForm = row
+        trademarkForm.x = 2
+      */
+      // console.log(row);
+      this.visible = true;
+      // row 代表当前行的数据 {}
+      // this.trademarkForm = row; // 地址值一样，修改trademarkForm会导致trademarkList发生变化
+      this.tradeMarkForm = { ...row };
+      // this.trademarkForm = JSON.parse(JSON.stringify(row)); 数据里没有函数可以用这个方法深度克隆
     },
   },
   mounted() {

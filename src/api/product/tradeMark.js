@@ -22,6 +22,16 @@ export default {
       data
     });
   },
+  /*
+  修改品牌
+  */
+ updateTrademark(data) {
+  return request({
+    url: `${api_name}/update`,
+    method: "PUT",
+    data
+  });
+},
    /*
   删除品牌
   */
