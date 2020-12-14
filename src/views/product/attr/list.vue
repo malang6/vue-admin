@@ -1,10 +1,12 @@
 <template>
   <div>
-    <Category
+    <!-- 自定义事件，但是后面的spu不能用 所以修改为了全局事件总线 -->
+    <!-- <Category
       @change="getAttrList"
       :isShowList="isShowList"
       @clearList="clearList"
-    />
+    /> -->
+    <Category :isShowList="isShowList" />
     <el-card style="margin-top: 20px" v-show="isShowList">
       <el-button
         type="primary"
@@ -252,6 +254,15 @@ export default {
       await this.$API.attr.deleteAttr(row.id);
       this.getAttrList(this.category);
     },
+  },
+  mounted() {
+    this.$bus.$on("change", this.getAttrList);
+    this.$bus.$on("clearList", this.clearList);
+  },
+  // 组件中绑定的全局事件总线 要在组件卸载的时候，将绑定的事件解绑
+  beforeDestroy() {
+    this.$bus.$off("change", this.getAttrList);
+    this.$bus.$off("clearList", this.clearList);
   },
   components: {
     Category,

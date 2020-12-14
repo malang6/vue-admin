@@ -15,10 +15,13 @@ export default {
   /*
   获取SPU分页列表信息
   */
-  getPageList(page, limit) {
+  getSpuList({ category3Id, page, limit }) {
     return request({
       url: `${api_name}/${page}/${limit}`,
-      method: "GET"
+      method: "GET",
+      params: {
+        category3Id
+      }
     });
   },
   /*
@@ -59,3 +62,31 @@ export default {
       method: "DELETE"
     });
   },
+  /*
+  获取品牌列表
+  */
+  getTrademarkList() {
+    return request({
+      url: `${api_name}/baseTrademark/getTrademarkList`,
+      method: "GET"
+    });
+  },
+  /*
+  获取SPU图片列表
+  */
+  getSpuImageList(spuId) {
+    return request({
+      url: `${api_name}/spuImageList/${spuId}`,
+      method: "GET"
+    });
+  },
+  /*
+  获取SPU销售属性列表
+  */
+  getSpuSaleAttrList(spuId) {
+    return request({
+      url: `${api_name}/spuSaleAttrList/${spuId}`,
+      method: "GET"
+    });
+  }
+};

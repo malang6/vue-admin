@@ -81,7 +81,7 @@
       :page-size.sync="limit"
       layout="prev, pager, next ,jumper, sizes,total"
       :total="total"
-      class="trademark-pagination"
+      class="pagination"
     >
     </el-pagination>
 
@@ -360,10 +360,7 @@ export default {
 .trademark-img
   width: 110px
   height: 70px
-.trademark-pagination
-  text-align: right
->>>.el-pagination__sizes
-  margin-left: 250px
+
 >>>.avatar-uploader .el-upload
   border: 1px dashed #d9d9d9
   border-radius: 6px

@@ -79,7 +79,7 @@ export default {
       } else {
         this.$message.error(result.message);
       }
-      this.$emit("clearList");
+      this.$bus.$emit("clearList");
     },
     async handleSelectChange2(category2Id) {
       this.category.category3Id = "";
@@ -90,14 +90,14 @@ export default {
       } else {
         this.$message.error(result.message);
       }
-      this.$emit("clearList");
+      this.$bus.$emit("clearList");
     },
     async handleSelectChange3(category3Id) {
       const category = {
         ...this.category,
         category3Id,
       };
-      this.$emit("change", this.category);
+      this.$bus.$emit("change", this.category);
     },
   },
   async mounted() {
