@@ -69,20 +69,28 @@ export default {
   methods: {
     async handleSelectChange1(category1Id) {
       // console.log(category1Id);
+      this.category.category2Id = "";
+      this.category.category3Id = "";
+      this.category2 = [];
+      this.category3 = [];
       const result = await this.$API.attr.getCategory2(category1Id);
       if (result.code === 200) {
         this.category2 = result.data;
       } else {
         this.$message.error(result.message);
       }
+      this.$emit("clearList");
     },
     async handleSelectChange2(category2Id) {
+      this.category.category3Id = "";
+      this.category3 = [];
       const result = await this.$API.attr.getCategory3(category2Id);
       if (result.code === 200) {
         this.category3 = result.data;
       } else {
         this.$message.error(result.message);
       }
+      this.$emit("clearList");
     },
     async handleSelectChange3(category3Id) {
       const category = {

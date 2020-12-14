@@ -1,8 +1,16 @@
 <template>
   <div>
-    <Category @change="getAttrList" :isShowList="isShowList" />
+    <Category
+      @change="getAttrList"
+      :isShowList="isShowList"
+      @clearList="clearList"
+    />
     <el-card style="margin-top: 20px" v-show="isShowList">
-      <el-button type="primary" icon="el-icon-plus" disabled
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        :disabled="!category.category3Id"
+        @click="addAttr"
         >添加属性</el-button
       >
       <el-table :data="attrList" border style="width: 100%; margin: 10px 0">
@@ -32,11 +40,17 @@
               size="mini"
               @click="handleEdit(row)"
             ></el-button>
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-            ></el-button>
+            <el-popconfirm
+              :title="`确定要删除 ${row.attrName} 吗？`"
+              @onConfirm="deleteAttr(row)"
+            >
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                slot="reference"
+              ></el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -53,6 +67,7 @@
         icon="el-icon-plus"
         style="margin-bottom: 10px"
         @click="addAttrValue"
+        :disabled="!attr.attrName"
         >添加属性</el-button
       >
       <el-table
@@ -109,7 +124,9 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="primary" @click="save">保存</el-button>
+      <el-button type="primary" @click="save" :disabled="!attr.attrName"
+        >保存</el-button
+      >
       <el-button @click="isShowList = true">取消</el-button>
     </el-card>
   </div>
@@ -131,11 +148,17 @@ export default {
   name: "AttrList",
   data() {
     return {
-      attrList: [],
-      isShowList: true,
+      attrList: [], //属性列表
+      isShowList: true, //true显示属性列表 false显示修改列表
       attr: {
+        //每一行的
         attrName: "",
         attrValueList: [],
+      },
+      category: {
+        category1Id: "",
+        category2Id: "",
+        category3Id: "",
       },
     };
   },
@@ -143,6 +166,7 @@ export default {
     //获取属性列表信息
     async getAttrList(category) {
       this.category = category;
+      //发送请求 获取属性列表信息
       const result = await this.$API.attr.getAttrInfoList(category);
       if (result.code === 200) {
         // console.log(result.data);
@@ -195,7 +219,14 @@ export default {
     },
     //保存修改
     async save() {
-      const result = await this.$API.attr.saveAttrInfo(this.attr);
+      // 判断是否是添加 (新添加的是没有id的。添加之后后台才会生成一个id)
+      const isAdd = !this.attr.id;
+      const data = this.attr;
+      if (isAdd) {
+        data.categoryId = this.category.category3Id;
+        data.categoryLevel = 3;
+      }
+      const result = await this.$API.attr.saveAttrInfo(data);
       if (result.code === 200) {
         this.isShowList = true;
         this.getAttrList(this.category);
@@ -203,6 +234,23 @@ export default {
       } else {
         this.$message.error(result.message);
       }
+    },
+    //添加属性
+    addAttr() {
+      this.isShowList = false;
+      this.attr.attrName = "";
+      this.attr.attrValueList = [];
+      this.attr.id = "";
+    },
+    clearList() {
+      // 清空数据
+      this.attrList = [];
+      // 禁用按钮
+      this.category.category3Id = "";
+    },
+    async deleteAttr(row) {
+      await this.$API.attr.deleteAttr(row.id);
+      this.getAttrList(this.category);
     },
   },
   components: {

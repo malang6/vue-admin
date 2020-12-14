@@ -3,7 +3,12 @@
     <el-button type="primary" icon="el-icon-plus" @click="addTrademark"
       >添加</el-button
     >
-    <el-table :data="tradeMarkList" border style="width: 100%; margin: 20px 0">
+    <el-table
+      :data="tradeMarkList"
+      border
+      style="width: 100%; margin: 20px 0"
+      v-loading="loading"
+    >
       <el-table-column
         type="index"
         label="序号"
@@ -166,6 +171,7 @@ export default {
         ],
         logoUrl: [{ required: true, message: "请上传品牌图片" }],
       },
+      loading: true,
     };
   },
   methods: {
@@ -180,7 +186,9 @@ export default {
     },
     // 请求分页列表数据
     async getPageList(page, limit) {
+      this.loading = true;
       const result = await this.$API.tradeMark.getPageList(page, limit);
+      this.loading = false;
       if (result.code === 200) {
         // this.$message.success("获取品牌信息列表成功~");
         this.tradeMarkList = result.data.records;
