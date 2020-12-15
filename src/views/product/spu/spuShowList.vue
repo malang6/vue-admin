@@ -32,7 +32,7 @@
               type="primary"
               icon="el-icon-plus"
               size="mini"
-              @click="$bus.$emit('showSpuAddSkuList')"
+              @click="$bus.$emit('showSpuAddSkuList', category, row)"
             ></el-button>
             <el-button
               type="warning"

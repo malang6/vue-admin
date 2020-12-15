@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SpuAddSkuList v-if="isShowSpuAddSkuList" />
+    <SpuAddSkuList v-if="isShowSpuAddSkuList" :category="category" :spuInfo="spuInfo"/>
     <div v-else>
       <Category :isShowList="isShowList" />
       <SpuShowList v-if="isShowList" />
@@ -28,6 +28,8 @@ export default {
       isShowList: true,
       isShowSpuAddSkuList: false,
       item: {}, //每一行的数据
+      category: {},
+      spuInfo: {},
     };
   },
   methods: {
@@ -42,7 +44,9 @@ export default {
         this.$bus.$emit("change", { category3Id });
       });
     },
-    showSpuAddSkuList() {
+    showSpuAddSkuList(category, row) {
+      this.category = category;
+      this.spuInfo = row;
       this.isShowSpuAddSkuList = true; //显示
     },
   },
