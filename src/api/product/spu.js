@@ -40,7 +40,7 @@ export default {
     return request({
       url: `${api_name}/saveSpuInfo`,
       method: "POST",
-      spuInfo
+      data: spuInfo
     });
   },
   /*
@@ -50,7 +50,7 @@ export default {
     return request({
       url: `${api_name}/updateSpuInfo`,
       method: "POST",
-      spuInfo
+      data: spuInfo
     });
   },
   /*

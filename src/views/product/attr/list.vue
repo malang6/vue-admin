@@ -96,6 +96,7 @@
               v-model="row.valueName"
               autofocus
               ref="input"
+              size="mini"
               @blur="editCompleted(row, $index)"
               @keyup.enter.native="editCompleted(row, $index)"
             >
@@ -208,7 +209,7 @@ export default {
       }
       row.edit = false;
     },
-    //添加属性
+    //添加属性的属性值
     addAttrValue() {
       this.attr.attrValueList.push({ edit: true });
       this.$nextTick(() => {
@@ -240,6 +241,7 @@ export default {
     //添加属性
     addAttr() {
       this.isShowList = false;
+      //清空数据。为了保证后续里面还是响应式的数据，所以采用下面方式清空。如果直接将attr赋值为{}，会导致里面的数据不是响应式的
       this.attr.attrName = "";
       this.attr.attrValueList = [];
       this.attr.id = "";

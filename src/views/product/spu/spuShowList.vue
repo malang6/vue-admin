@@ -1,7 +1,15 @@
 <template>
   <div>
     <el-card style="margin-top: 20px">
-      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        @click="
+          $bus.$emit('showSpuList', { category3Id: category.category3Id })
+        "
+        :disabled="!category.category3Id"
+        >添加SPU</el-button
+      >
       <el-table
         :data="spuList"
         border
@@ -24,6 +32,7 @@
               type="primary"
               icon="el-icon-plus"
               size="mini"
+              @click="$bus.$emit('showSpuAddSkuList')"
             ></el-button>
             <el-button
               type="warning"
@@ -32,7 +41,10 @@
               @click="$bus.$emit('showSpuList', row)"
             ></el-button>
             <el-button type="info" icon="el-icon-info" size="mini"></el-button>
-            <el-popconfirm :title="`确定要删除 吗？`">
+            <el-popconfirm
+              :title="`确定要删除 ${row.spuName} 吗？`"
+              @onConfirm="deleteSpu(row)"
+            >
               <el-button
                 type="danger"
                 icon="el-icon-delete"
@@ -98,12 +110,23 @@ export default {
       this.category = category;
       this.getPageList(this.page, this.limit);
     },
+    //当重新选择了一二级分类都要清空数据
     clearList() {
       this.spuList = [];
       this.page = 1;
       this.limit = 3;
       this.total = 0;
       this.category.category3Id = "";
+    },
+    //删除spu
+    async deleteSpu(row) {
+      const result = await this.$API.spu.deleteAttr(row.id);
+      if (result.code === 200) {
+        this.$message.success("删除SPU成功！");
+        this.getPageList(this.page, this.limit);
+      } else {
+        this.$message.error(result.message);
+      }
     },
   },
   mounted() {
