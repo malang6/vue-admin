@@ -1,28 +1,42 @@
 <template>
   <div>
     <el-card style="margin-top: 20px">
-      <el-form>
+      <el-form :model="sku">
         <el-form-item label="SPU名称" prop="spuName" label-width="80px">
-          <span>红米K30 Pro777</span>
+          <span>{{ spu.spuName }}</span>
         </el-form-item>
-        <el-form-item label="SPU名称" prop="spuName" label-width="80px">
-          <el-input placeholder="SPU名称"></el-input>
+        <el-form-item label="SKU名称" prop="skuName" label-width="80px">
+          <el-input placeholder="SKU名称" v-model="sku.skuName"></el-input>
         </el-form-item>
-        <el-form-item label="价格(元)" prop="spuPrice" label-width="80px">
-          <el-input type="number" placeholder="SPU价格"></el-input>
+        <el-form-item label="价格(元)" prop="price" label-width="80px" :min="0">
+          <el-input
+            type="number"
+            placeholder="SKU价格"
+            v-model="sku.price"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="重量(千克)" prop="spuWeight" label-width="80px">
-          <el-input type="number" placeholder="SPU重量"></el-input>
+        <el-form-item
+          label="重量(千克)"
+          prop="weight"
+          label-width="80px"
+          :min="0"
+        >
+          <el-input
+            type="number"
+            placeholder="SKU重量"
+            v-model="sku.weight"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="规格描述" prop="spuDesc" label-width="80px">
+        <el-form-item label="规格描述" prop="skuDesc" label-width="80px">
           <el-input
             type="textarea"
             rows="4"
-            placeholder="SPU规格描述"
+            placeholder="SKU规格描述"
+            v-model="sku.skuDesc"
           ></el-input>
         </el-form-item>
         <el-form-item label="平台属性" prop="spuAttr" label-width="80px">
-          <el-form inline :model="attrInfoList">
+          <el-form inline>
             <el-form-item
               v-for="attrInfo in attrInfoList"
               :key="attrInfo.id"
@@ -30,20 +44,19 @@
               prop="spuName"
               label-width="100px"
             >
-              <el-select placeholder="请输入">
+              <el-select placeholder="请选择" v-model="attrInfo.attrValueId">
                 <el-option
-                  label="saleAttr.name"
-                  :value="attrValue.id"
                   v-for="attrValue in attrInfo.attrValueList"
+                  :label="attrValue.valueName"
+                  :value="attrValue.id"
                   :key="attrValue.id"
-                  >{{ attrValue.valueName }}</el-option
-                >
+                ></el-option>
               </el-select>
             </el-form-item>
           </el-form>
         </el-form-item>
         <el-form-item label="销售属性" prop="saleAttrName" label-width="80px">
-          <el-form inline :model="spuSaleAttrList">
+          <el-form inline>
             <el-form-item
               :label="spuSaleAttr.saleAttrName"
               prop="spuName"
@@ -51,13 +64,16 @@
               v-for="spuSaleAttr in spuSaleAttrList"
               :key="spuSaleAttr.id"
             >
-              <el-select placeholder="请输入">
+              <el-select
+                placeholder="请选择"
+                v-model="spuSaleAttr.saleAttrValueId"
+              >
                 <el-option
+                  :label="spuValue.saleAttrValueName"
                   :value="spuValue.id"
                   v-for="spuValue in spuSaleAttr.spuSaleAttrValueList"
                   :key="spuValue.id"
-                  >{{ spuValue.saleAttrValueName }}</el-option
-                >
+                ></el-option>
               </el-select>
             </el-form-item>
           </el-form>
@@ -67,7 +83,6 @@
             border
             :data="spuImageList"
             ref="multipleTable"
-            tooltip-effect="dark"
             style="width: 100%; margin-bottom: 20px"
           >
             <el-table-column type="selection" width="55"> </el-table-column>
@@ -81,7 +96,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="imgName" label="名称"> </el-table-column>
-            <el-table-column label="操作" show-overflow-tooltip>
+            <el-table-column label="操作">
               <el-button type="primary" size="mini">设为默认</el-button>
             </el-table-column>
           </el-table>
@@ -95,13 +110,20 @@
 
 <script>
 export default {
-  name: "SpuAddSkuList",
+  name: "SkuList",
   props: {
     category: Object,
-    spuInfo: Object,
+    item: Object,
   },
   data() {
     return {
+      spu: this.item,
+      sku: {
+        skuName: "", //sku名称
+        price: "", //价格
+        weight: "", //重量
+        skuDesc: "", //规格描述
+      },
       attrInfoList: [], //平台属性列表信息
       spuSaleAttrList: [], //SPU销售属性列表
       spuImageList: [], //SPU图片列表
@@ -120,7 +142,7 @@ export default {
     },
     //获取SPU销售属性列表
     async getSpuSaleAttrList() {
-      const result = await this.$API.spu.getSpuSaleAttrList(this.spuInfo.id);
+      const result = await this.$API.spu.getSpuSaleAttrList(this.spu.id);
       if (result.code === 200) {
         this.spuSaleAttrList = result.data;
         this.$message.success("获取SPU销售属性列表成功！");
@@ -130,7 +152,7 @@ export default {
     },
     //获取SPU图片列表
     async getSpuImageList() {
-      const result = await this.$API.spu.getSpuImageList(this.spuInfo.id);
+      const result = await this.$API.spu.getSpuImageList(this.spu.id);
       if (result.code === 200) {
         this.spuImageList = result.data;
         this.$message.success("获取SPU销售属性列表成功！");

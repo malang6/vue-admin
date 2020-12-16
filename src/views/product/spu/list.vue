@@ -1,10 +1,10 @@
 <template>
   <div>
-    <SpuAddSkuList v-if="isShowSpuAddSkuList" :category="category" :spuInfo="spuInfo"/>
+    <SkuList v-if="isShowAddSkuList" :category="category" :item="item" />
     <div v-else>
       <Category :isShowList="isShowList" />
       <SpuShowList v-if="isShowList" />
-      <SpuUpdateList v-else :item="item" @exit="exit" />
+      <SpuUpdateList v-else :spuItem="spuItem" @exit="exit" />
     </div>
 
     <!--
@@ -20,22 +20,22 @@
 import Category from "@/components/Category";
 import SpuShowList from "./spuShowList";
 import SpuUpdateList from "./spuUpdateList";
-import SpuAddSkuList from "./spuAddSkuList";
+import SkuList from "./skuList";
 export default {
   name: "SpuList",
   data() {
     return {
       isShowList: true,
-      isShowSpuAddSkuList: false,
-      item: {}, //每一行的数据
+      isShowAddSkuList: false,
+      spuItem: {}, //每一行的数据
       category: {},
-      spuInfo: {},
+      item: {},
     };
   },
   methods: {
     showSpuList(row) {
       this.isShowList = false;
-      this.item = { ...row };
+      this.spuItem = { ...row };
     },
     exit(category3Id) {
       this.isShowList = true;
@@ -46,8 +46,8 @@ export default {
     },
     showSpuAddSkuList(category, row) {
       this.category = category;
-      this.spuInfo = row;
-      this.isShowSpuAddSkuList = true; //显示
+      this.item = row;
+      this.isShowAddSkuList = true; //显示
     },
   },
   mounted() {
@@ -63,7 +63,7 @@ export default {
     Category,
     SpuShowList,
     SpuUpdateList,
-    SpuAddSkuList,
+    SkuList,
   },
 };
 </script>

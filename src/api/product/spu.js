@@ -88,5 +88,11 @@ export default {
       url: `${api_name}/spuSaleAttrList/${spuId}`,
       method: "GET"
     });
+  },
+  ///admin/product/findBySpuId/{spuId}
+  findBySpuId(spuId) {
+    return request({
+      url: `${api_name}/findBySpuId/${spuId}`
+    });
   }
 };

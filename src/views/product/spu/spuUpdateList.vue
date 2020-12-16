@@ -1,6 +1,17 @@
 <template>
   <div>
     <el-card style="margin-top: 20px">
+      <!--
+      表单校验：
+        1. 整体form表单中
+        2. 通过prop属性来定义表单项名称
+        3. 定义表单校验规则
+          - 在data中定义rules
+          - 绑定给form
+        4. 校验表单
+          - 给form绑定ref
+          - this.$refs.spuForm.validate 校验表单
+     -->
       <el-form :model="spu" :rules="rules" ref="spuForm">
         <!-- prop 是用来表单校验时用的。不做表单校验就没必要写。 -->
         <el-form-item label="SPU名称" prop="spuName" label-width="80px">
@@ -144,12 +155,12 @@
 export default {
   name: "SpuUpdateList",
   props: {
-    item: Object,
+    spuItem: Object,
   },
   data() {
     return {
       // spu: {},
-      spu: this.item,
+      spu: this.spuItem,
       trademarkList: [], //品牌列表
       spuImageList: [], //SPU图片列表
       spuSaleAttrList: [], //当前SPU销售属性列表（下面表格里的数据）
@@ -182,6 +193,9 @@ export default {
         // [{imgName: '', imgUrl: ''}]
         // [{name: '', url: ''}]
         return {
+          // 一上来请求回来的数据只有id
+          // 新添加的数据不能设置id（由后台设置），所以写的是uid
+          // 总之，id一定由后台服务器生成
           uid: img.uid || img.id,
           name: img.imgName,
           url: img.imgUrl,
@@ -327,7 +341,8 @@ export default {
       });
     },
     //input框失去焦点时触发
-    editCompleted(row, index) {
+    editCompleted(row, index, a) {
+      if (!this.attrValue) return;
       const isNotOk = row.spuSaleAttrValueList.find(
         (sale) => sale.saleAttrValueName === this.attrValue
       );
@@ -338,15 +353,13 @@ export default {
         });
         return;
       }
-      if (this.attrValue.trim()) {
-        const spuSaleAttrValue = {
-          baseSaleAttrId: row.baseSaleAttrId,
-          saleAttrName: row.saleAttrName,
-          saleAttrValueName: this.attrValue,
-          spuId: row.spuId,
-        };
-        row.spuSaleAttrValueList.push(spuSaleAttrValue);
-      }
+      const spuSaleAttrValue = {
+        baseSaleAttrId: row.baseSaleAttrId,
+        saleAttrName: row.saleAttrName,
+        saleAttrValueName: this.attrValue,
+        spuId: row.spuId,
+      };
+      row.spuSaleAttrValueList.push(spuSaleAttrValue);
       this.attrValue = "";
       row.edit = false;
     },
@@ -388,7 +401,7 @@ export default {
           }
           if (result.code === 200) {
             this.$message.success(
-              `${this.spu.id ? "保存修改" : "添加"}SPU的数据成功！`
+              `${this.spu.id ? "修改" : "添加"}SPU的数据成功！`
             );
             this.$emit("exit", this.spu.category3Id);
           } else {
@@ -396,13 +409,6 @@ export default {
           }
         }
       });
-      //清空数据
-      /* this.spu.spuName = "";
-      this.spu.description = "";
-      this.spu.category3Id = "";
-      this.spu.tmId = "";
-      this.spuImageList = [];
-      this.spuSaleAttrList = []; */
     },
   },
 

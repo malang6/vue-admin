@@ -28,19 +28,35 @@
         </el-table-column>
         <el-table-column label="操作">
           <template v-slot="{ row }">
-            <el-button
-              type="primary"
-              icon="el-icon-plus"
-              size="mini"
-              @click="$bus.$emit('showSpuAddSkuList', category, row)"
-            ></el-button>
+            <el-tooltip
+              placement="bottom-end"
+              content="添加SKU"
+              effect="light"
+              :open-delay="300"
+              :enterable="false"
+              :visible-arrow="false"
+              :offset="35"
+            >
+              <el-button
+                type="primary"
+                icon="el-icon-plus"
+                size="mini"
+                @click="$bus.$emit('showSpuAddSkuList', category, row)"
+              ></el-button>
+            </el-tooltip>
+
             <el-button
               type="warning"
               icon="el-icon-edit"
               size="mini"
               @click="$bus.$emit('showSpuList', row)"
             ></el-button>
-            <el-button type="info" icon="el-icon-info" size="mini"></el-button>
+            <el-button
+              type="info"
+              icon="el-icon-info"
+              size="mini"
+              @click="showDialog(row)"
+            ></el-button>
             <el-popconfirm
               :title="`确定要删除 ${row.spuName} 吗？`"
               @onConfirm="deleteSpu(row)"
@@ -52,6 +68,39 @@
                 slot="reference"
               ></el-button>
             </el-popconfirm>
+            <!-- 弹框 -->
+            <el-dialog
+              :title="`${row.spuName} => SKU列表`"
+              :visible.sync="dialogVisible"
+            >
+              <el-table :data="skuInfoList">
+                <el-table-column
+                  property="skuName"
+                  label="名称"
+                  width="150"
+                ></el-table-column>
+                <el-table-column
+                  property="price"
+                  label="价格(元)"
+                  width="200"
+                ></el-table-column>
+                <el-table-column
+                  property="weight"
+                  label="重量(KG)"
+                  width="200"
+                ></el-table-column>
+                <el-table-column label="默认图片">
+                  <template v-slot="{ row }">
+                    <img
+                      :src="row.skuDefaultImg"
+                      alt="默认图片"
+                      width="120px"
+                      height="80px"
+                    />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-dialog>
           </template>
         </el-table-column>
       </el-table>
@@ -85,6 +134,8 @@ export default {
         category3Id: "",
       },
       loading: false,
+      dialogVisible: false,
+      skuInfoList: [],
     };
   },
   methods: {
@@ -124,6 +175,17 @@ export default {
       if (result.code === 200) {
         this.$message.success("删除SPU成功！");
         this.getPageList(this.page, this.limit);
+      } else {
+        this.$message.error(result.message);
+      }
+    },
+    // 显示dialog对话框
+    async showDialog(row) {
+      console.log(row);
+      this.dialogVisible = true;
+      const result = await this.$API.spu.findBySpuId(row.id);
+      if (result.code === 200) {
+        this.skuInfoList = result.data;
       } else {
         this.$message.error(result.message);
       }
