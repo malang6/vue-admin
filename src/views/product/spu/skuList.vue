@@ -109,10 +109,10 @@
 </template>
 
 <script>
+import {mapState} from "vuex"
 export default {
   name: "SkuList",
   props: {
-    category: Object,
     item: Object,
   },
   data() {
@@ -128,6 +128,11 @@ export default {
       spuSaleAttrList: [], //SPU销售属性列表
       spuImageList: [], //SPU图片列表
     };
+  },
+  computed:{
+    ...mapState({
+          category:(state)=>state.category.category
+        }),
   },
   methods: {
     // 获取属性列表

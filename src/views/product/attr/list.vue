@@ -136,6 +136,7 @@
 </template>
 
 <script>
+import {mapState} from "vuex"
 import Category from "@/components/Category";
 /*
 categoryId:61
@@ -158,19 +159,34 @@ export default {
         attrName: "",
         attrValueList: [],
       },
-      category: {
-        category1Id: "",
-        category2Id: "",
-        category3Id: "",
-      },
+      // category: {
+      //   category1Id: "",
+      //   category2Id: "",
+      //   category3Id: "",
+      // },
     };
+  },
+  computed:{
+    ...mapState({
+      category:(state)=>state.category.category
+    })
+  },
+  watch:{
+    "category.category3Id"(category3Id){
+        this.getAttrList()
+      },
+    "category.category1Id"(){
+      this.clearList();
+    },
+    "category.category2Id"(){
+      this.clearList();
+    }
   },
   methods: {
     //获取属性列表信息
-    async getAttrList(category) {
-      this.category = category;
+    async getAttrList() {
       //发送请求 获取属性列表信息
-      const result = await this.$API.attr.getAttrInfoList(category);
+      const result = await this.$API.attr.getAttrInfoList({...this.category});
       if (result.code === 200) {
         // console.log(result.data);
         // 子组件给父组件传递参数 自定义事件
@@ -232,7 +248,7 @@ export default {
       const result = await this.$API.attr.saveAttrInfo(data);
       if (result.code === 200) {
         this.isShowList = true;
-        this.getAttrList(this.category);
+        this.getAttrList();
         this.$message.success("保存属性成功");
       } else {
         this.$message.error(result.message);
@@ -254,17 +270,17 @@ export default {
     },
     async deleteAttr(row) {
       await this.$API.attr.deleteAttr(row.id);
-      this.getAttrList(this.category);
+      this.getAttrList();
     },
   },
   mounted() {
-    this.$bus.$on("change", this.getAttrList);
-    this.$bus.$on("clearList", this.clearList);
+    // this.$bus.$on("change", this.getAttrList);
+    // this.$bus.$on("clearList", this.clearList);
   },
   // 组件中绑定的全局事件总线 要在组件卸载的时候，将绑定的事件解绑
   beforeDestroy() {
-    this.$bus.$off("change", this.getAttrList);
-    this.$bus.$off("clearList", this.clearList);
+    // this.$bus.$off("change", this.getAttrList);
+    // this.$bus.$off("clearList", this.clearList);
   },
   components: {
     Category,

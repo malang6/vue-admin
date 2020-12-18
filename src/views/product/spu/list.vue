@@ -1,9 +1,13 @@
 <template>
   <div>
-    <SkuList v-if="isShowAddSkuList" :category="category" :item="item" />
+    <SkuList v-if="isShowAddSkuList" :item="item" />
     <div v-else>
       <Category :isShowList="isShowList" />
-      <SpuShowList v-if="isShowList" />
+      <SpuShowList
+        v-if="isShowList"
+        @showSpuList="showSpuList"
+        @showSpuAddSkuList="showSpuAddSkuList"
+      />
       <SpuUpdateList v-else :spuItem="spuItem" @exit="exit" />
     </div>
 
@@ -28,7 +32,7 @@ export default {
       isShowList: true,
       isShowAddSkuList: false,
       spuItem: {}, //每一行的数据
-      category: {},
+      // category: {},
       item: {},
     };
   },
@@ -37,27 +41,28 @@ export default {
       this.isShowList = false;
       this.spuItem = { ...row };
     },
-    exit(category3Id) {
+    exit() {
       this.isShowList = true;
       //等spuShowList组件加载完成再发请求
+      /*  const {category3Id} = this.category
       this.$nextTick(() => {
-        this.$bus.$emit("change", { category3Id });
-      });
+        this.$bus.$emit("change", category3Id);
+      }); */
     },
-    showSpuAddSkuList(category, row) {
-      this.category = category;
+    showSpuAddSkuList(row) {
       this.item = row;
       this.isShowAddSkuList = true; //显示
     },
   },
   mounted() {
-    this.$bus.$on("showSpuList", this.showSpuList);
-    this.$bus.$on("showSpuAddSkuList", this.showSpuAddSkuList);
+    // this.$bus.$on("showSpuList", this.showSpuList);
+    // this.$bus.$on("showSpuAddSkuList", this.showSpuAddSkuList);
   },
   // 组件中绑定的全局事件总线 要在组件卸载的时候，将绑定的事件解绑
   beforeDestroy() {
-    this.$bus.$off("showSpuList", this.showSpuList);
-    this.$bus.$off("showSpuAddSkuList", this.showSpuAddSkuList);
+    // this.$bus.$off("showSpuList", this.showSpuList);
+    // this.$bus.$off("showSpuAddSkuList", this.showSpuAddSkuList);
+    this.$store.commit("category/SET_CATEGORY");
   },
   components: {
     Category,

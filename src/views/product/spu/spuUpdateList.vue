@@ -144,7 +144,7 @@
             </el-table-column>
           </el-table>
           <el-button type="primary" @click="saveUpdateSpuInfo">保存</el-button>
-          <el-button @click="$emit('exit', spu.category3Id)">取消</el-button>
+          <el-button @click="$emit('exit')">取消</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -152,6 +152,7 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
 export default {
   name: "SpuUpdateList",
   props: {
@@ -180,6 +181,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      category:(state)=>state.category.category
+    }),
     filterSaleAttrList() {
       return this.baseSaleAttrList.filter((baseSaleAttr) => {
         return !this.spuSaleAttrList.find(
@@ -390,6 +394,7 @@ export default {
           }; */
           const spuInfo = {
             ...this.spu,
+            category3Id:this.category.category3Id,
             spuImageList: this.spuImageList,
             spuSaleAttrList: this.spuSaleAttrList,
           };
@@ -403,7 +408,7 @@ export default {
             this.$message.success(
               `${this.spu.id ? "修改" : "添加"}SPU的数据成功！`
             );
-            this.$emit("exit", this.spu.category3Id);
+            this.$emit("exit");
           } else {
             this.$message.error(result.message);
           }

@@ -5,7 +5,7 @@
         type="primary"
         icon="el-icon-plus"
         @click="
-          $bus.$emit('showSpuList', { category3Id: category.category3Id })
+          $emit('showSpuList')
         "
         :disabled="!category.category3Id"
         >添加SPU</el-button
@@ -41,15 +41,14 @@
                 type="primary"
                 icon="el-icon-plus"
                 size="mini"
-                @click="$bus.$emit('showSpuAddSkuList', category, row)"
+                @click="$emit('showSpuAddSkuList', row)"
               ></el-button>
             </el-tooltip>
-
             <el-button
               type="warning"
               icon="el-icon-edit"
               size="mini"
-              @click="$bus.$emit('showSpuList', row)"
+              @click="$emit('showSpuList', row)"
             ></el-button>
             <el-button
               type="info"
@@ -68,39 +67,6 @@
                 slot="reference"
               ></el-button>
             </el-popconfirm>
-            <!-- 弹框 -->
-            <el-dialog
-              :title="`${row.spuName} => SKU列表`"
-              :visible.sync="dialogVisible"
-            >
-              <el-table :data="skuInfoList">
-                <el-table-column
-                  property="skuName"
-                  label="名称"
-                  width="150"
-                ></el-table-column>
-                <el-table-column
-                  property="price"
-                  label="价格(元)"
-                  width="200"
-                ></el-table-column>
-                <el-table-column
-                  property="weight"
-                  label="重量(KG)"
-                  width="200"
-                ></el-table-column>
-                <el-table-column label="默认图片">
-                  <template v-slot="{ row }">
-                    <img
-                      :src="row.skuDefaultImg"
-                      alt="默认图片"
-                      width="120px"
-                      height="80px"
-                    />
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-dialog>
           </template>
         </el-table-column>
       </el-table>
@@ -116,10 +82,41 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 弹框 -->
+    <el-dialog :title="`${spuName} => SKU列表`" :visible.sync="dialogVisible">
+      <el-table :data="skuInfoList">
+        <el-table-column
+          property="skuName"
+          label="名称"
+          width="150"
+        ></el-table-column>
+        <el-table-column
+          property="price"
+          label="价格(元)"
+          width="200"
+        ></el-table-column>
+        <el-table-column
+          property="weight"
+          label="重量(KG)"
+          width="200"
+        ></el-table-column>
+        <el-table-column label="默认图片">
+          <template v-slot="{ row }">
+            <img
+              :src="row.skuDefaultImg"
+              alt="默认图片"
+              width="120px"
+              height="80px"
+            />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "SpuShowList",
   data() {
@@ -128,15 +125,36 @@ export default {
       page: 1,
       limit: 3,
       total: 0,
-      category: {
-        category1Id: "",
-        category2Id: "",
-        category3Id: "",
-      },
+      // category: {
+      //   category1Id: "",
+      //   category2Id: "",
+      //   category3Id: "",
+      // },
       loading: false,
       dialogVisible: false,
       skuInfoList: [],
+      spuName: "",
     };
+  },
+  computed: {
+    ...mapState({
+      category: (state) => state.category.category,
+    }),
+  },
+  watch: {
+    "category.category3Id": {
+      handler(category3Id) {
+        if (!category3Id) return;
+        this.getPageList(this.page, this.limit);
+      },
+      immediate: true, // 一上来触发一次
+    },
+    "category.category1Id"(){
+      this.clearList();
+    },
+    "category.category2Id"(){
+      this.clearList();
+    }
   },
   methods: {
     async getPageList(page, limit) {
@@ -181,7 +199,7 @@ export default {
     },
     // 显示dialog对话框
     async showDialog(row) {
-      console.log(row);
+      this.spuName = row.spuName;
       this.dialogVisible = true;
       const result = await this.$API.spu.findBySpuId(row.id);
       if (result.code === 200) {
@@ -192,13 +210,13 @@ export default {
     },
   },
   mounted() {
-    this.$bus.$on("change", this.handleCategoryChange);
-    this.$bus.$on("clearList", this.clearList);
+    // this.$bus.$on("change", this.handleCategoryChange);
+    // this.$bus.$on("clearList", this.clearList);
   },
   // 组件中绑定的全局事件总线 要在组件卸载的时候，将绑定的事件解绑
   beforeDestroy() {
-    this.$bus.$off("change", this.handleCategoryChange);
-    this.$bus.$off("clearList", this.clearList);
+    // this.$bus.$off("change", this.handleCategoryChange);
+    // this.$bus.$off("clearList", this.clearList);
   },
 };
 </script>

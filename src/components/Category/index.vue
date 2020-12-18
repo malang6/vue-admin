@@ -9,7 +9,7 @@
           :disabled="!isShowList"
         >
           <el-option
-            v-for="c1 in category1"
+            v-for="c1 in category1List"
             :key="c1.id"
             :label="c1.name"
             :value="c1.id"
@@ -24,7 +24,7 @@
           :disabled="!isShowList"
         >
           <el-option
-            v-for="c2 in category2"
+            v-for="c2 in category2List"
             :key="c2.id"
             :label="c2.name"
             :value="c2.id"
@@ -39,7 +39,7 @@
           :disabled="!isShowList"
         >
           <el-option
-            v-for="c3 in category3"
+            v-for="c3 in category3List"
             :key="c3.id"
             :label="c3.name"
             :value="c3.id"
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   name: "Category",
   data() {
@@ -60,22 +61,50 @@ export default {
         category2Id: "",
         category3Id: "",
       },
-      category1: [],
-      category2: [],
-      category3: [],
+      // category1List: [],
+      // category2List: [],
+      // category3List: [],
     };
   },
   props: ["isShowList"],
+  computed: {
+    ...mapState({
+      category1List: (state) => state.category.category1List,
+      category2List: (state) => state.category.category2List,
+      category3List: (state) => state.category.category3List,
+    }),
+  },
   methods: {
-    async handleSelectChange1(category1Id) {
+    ...mapMutations(["category/SET_CATEGORY3_ID"]),
+    ...mapActions([
+      "category/getCategory1List",
+      "category/getCategory2List",
+      "category/getCategory3List",
+    ]),
+    handleSelectChange1(category1Id) {
+      this.category.category2Id = "";
+      this.category.category3Id = "";
+      this["category/getCategory2List"](category1Id);
+      // this.$bus.$emit("clearList");
+    },
+    handleSelectChange2(category2Id) {
+      this.category.category3Id = "";
+      this["category/getCategory3List"](category2Id);
+      // this.$bus.$emit("clearList");
+    },
+    handleSelectChange3(category3Id) {
+      this["category/SET_CATEGORY3_ID"](category3Id);
+      // this.$bus.$emit("change",this.category);
+    },
+    /* async handleSelectChange1(category1Id) {
       // console.log(category1Id);
       this.category.category2Id = "";
       this.category.category3Id = "";
-      this.category2 = [];
-      this.category3 = [];
+      this.category2List = [];
+      this.category3List = [];
       const result = await this.$API.attr.getCategory2(category1Id);
       if (result.code === 200) {
-        this.category2 = result.data;
+        this.category2List = result.data;
       } else {
         this.$message.error(result.message);
       }
@@ -83,10 +112,10 @@ export default {
     },
     async handleSelectChange2(category2Id) {
       this.category.category3Id = "";
-      this.category3 = [];
+      this.category3List = [];
       const result = await this.$API.attr.getCategory3(category2Id);
       if (result.code === 200) {
-        this.category3 = result.data;
+        this.category3List = result.data;
       } else {
         this.$message.error(result.message);
       }
@@ -98,15 +127,16 @@ export default {
         category3Id,
       };
       this.$bus.$emit("change", this.category);
-    },
+    }, */
   },
   async mounted() {
-    const result = await this.$API.attr.getCategory1();
+    this["category/getCategory1List"]();
+    /* const result = await this.$API.attr.getCategory1();
     if (result.code === 200) {
-      this.category1 = result.data;
+      this.category1List = result.data;
     } else {
       this.$message.error(result.message);
-    }
+    } */
   },
 };
 </script>
