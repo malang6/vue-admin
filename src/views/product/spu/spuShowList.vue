@@ -175,10 +175,10 @@ export default {
       this.loading = false;
     },
     // 处理category的change（当选中三级分类时触发）
-    handleCategoryChange(category) {
+    /*  handleCategoryChange(category) {
       this.category = category;
       this.getPageList(this.page, this.limit);
-    },
+    }, */
     //当重新选择了一二级分类都要清空数据
     clearList() {
       this.spuList = [];

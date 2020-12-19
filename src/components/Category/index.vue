@@ -55,12 +55,19 @@ import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   name: "Category",
   data() {
+    const { category } = this.$store.state.category;
     return {
       category: {
-        category1Id: "",
-        category2Id: "",
-        category3Id: "",
+        category1Id: category.category1Id,
+        category2Id: category.category2Id,
+        category3Id: category.category3Id,
       },
+
+      // category: {
+      //   category1Id: "",
+      //   category2Id: "",
+      //   category3Id: "",
+      // },
       // category1List: [],
       // category2List: [],
       // category3List: [],
@@ -72,6 +79,8 @@ export default {
       category1List: (state) => state.category.category1List,
       category2List: (state) => state.category.category2List,
       category3List: (state) => state.category.category3List,
+      // 不行：数据代理是先代理data数据，再代理计算属性
+      // category: (state) => state.category.category,
     }),
   },
   methods: {

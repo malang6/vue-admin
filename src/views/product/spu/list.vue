@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SkuList v-if="isShowAddSkuList" :item="item" />
+    <SkuList v-if="isShowAddSkuList" :item="item" @exit="exit" />
     <div v-else>
       <Category :isShowList="isShowList" />
       <SpuShowList
@@ -43,6 +43,7 @@ export default {
     },
     exit() {
       this.isShowList = true;
+      this.isShowAddSkuList = false;
       //等spuShowList组件加载完成再发请求
       /*  const {category3Id} = this.category
       this.$nextTick(() => {

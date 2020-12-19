@@ -1,4 +1,5 @@
-import * as API from "@/api";
+// import * as API from "@/api";
+import API from "@/api";
 import { Message } from "element-ui";
 
 export default {
@@ -82,10 +83,10 @@ export default {
     SET_CATEGORY3_ID(state, category3Id) {
       state.category.category3Id = category3Id;
     },
-    SET_CATEGORY(state){
-      state.category.category1Id="";
-      state.category.category2Id="";
-      state.category.category3Id="";
+    SET_CATEGORY(state) {
+      state.category.category1Id = "";
+      state.category.category2Id = "";
+      state.category.category3Id = "";
     }
   }
 };

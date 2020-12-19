@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import {mapState} from "vuex"
+import { mapState } from "vuex";
 import Category from "@/components/Category";
 /*
 categoryId:61
@@ -166,27 +166,27 @@ export default {
       // },
     };
   },
-  computed:{
+  computed: {
     ...mapState({
-      category:(state)=>state.category.category
-    })
+      category: (state) => state.category.category,
+    }),
   },
-  watch:{
-    "category.category3Id"(category3Id){
-        this.getAttrList()
-      },
-    "category.category1Id"(){
+  watch: {
+    "category.category3Id"(category3Id) {
+      this.getAttrList();
+    },
+    "category.category1Id"() {
       this.clearList();
     },
-    "category.category2Id"(){
+    "category.category2Id"() {
       this.clearList();
-    }
+    },
   },
   methods: {
     //获取属性列表信息
     async getAttrList() {
       //发送请求 获取属性列表信息
-      const result = await this.$API.attr.getAttrInfoList({...this.category});
+      const result = await this.$API.attr.getAttrInfoList({ ...this.category });
       if (result.code === 200) {
         // console.log(result.data);
         // 子组件给父组件传递参数 自定义事件
@@ -281,6 +281,7 @@ export default {
   beforeDestroy() {
     // this.$bus.$off("change", this.getAttrList);
     // this.$bus.$off("clearList", this.clearList);
+    this.$store.commit("category/SET_CATEGORY");
   },
   components: {
     Category,
