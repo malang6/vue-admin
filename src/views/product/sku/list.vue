@@ -144,11 +144,7 @@
         <el-col :span="6"><div class="grid-content">商品图片</div></el-col>
         <el-col :span="15" class="content">
           <div class="block">
-            <el-carousel
-              trigger="click"
-              height="400px"
-              class="carousel"
-            >
+            <el-carousel trigger="click" height="400px" class="carousel">
               <el-carousel-item
                 v-for="img in skuInfo.skuImageList"
                 :key="img.id"
@@ -225,8 +221,9 @@ export default {
       this.drawer = true;
       const result = await this.$API.sku.getSkuById(skuId);
       if (result.code === 200) {
-        console.log(result);
-        this.skuInfo = JSON.parse(JSON.stringify(result.data));
+        // console.log(result);
+        // this.skuInfo = JSON.parse(JSON.stringify(result.data));
+        this.skuInfo = result.data;
       }
     },
     //关闭抽屉

@@ -17,9 +17,7 @@ const modules = context.keys().reduce((modules, modulePath) => {
   const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, "$1");
 
   if (moduleName !== "index") {
-    (moduleName.split("/")[1] !== "index"
-    ? 1
-    : 0)
+    moduleName.split("/")[1] !== "index"
       ? (modules[moduleName.split("/")[1]] = context(modulePath).default)
       : (modules[moduleName.split("/")[0]] = context(modulePath).default);
     return modules;

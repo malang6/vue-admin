@@ -345,7 +345,7 @@ export default {
       });
     },
     //input框失去焦点时触发
-    editCompleted(row, index, a) {
+    editCompleted(row, index) {
       if (!this.attrValue) return;
       const isNotOk = row.spuSaleAttrValueList.find(
         (sale) => sale.saleAttrValueName === this.attrValue
